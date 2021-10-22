@@ -26,4 +26,11 @@ contract SpaceMafia is Ownable {
         planetType = galaxyToken.createTokenType(true);
         spaceshipType = galaxyToken.createTokenType(true);
     }
+
+    function mintPlanet(
+        address _account,
+        string _tokenURI
+    ) public onlyOwner() returns(uint256 _id){
+        _id = galaxyToken.nonFungibleMint(_account, planetType, _tokenURI);
+    }
 }
