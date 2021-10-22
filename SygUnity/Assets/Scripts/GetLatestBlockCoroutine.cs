@@ -9,7 +9,6 @@ using System.Diagnostics;
 
 public class GetLatestBlockCoroutine : MonoBehaviour
 {
-    // public string Url = "https://ropsten.infura.io";
     public string UrlFull = "https://mainnet.infura.io/v3/8641c45d947a4e159304a56bdad174e2";
 
     public InputField ResultBlockNumber;
@@ -18,7 +17,7 @@ public class GetLatestBlockCoroutine : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        // InputUrl.text = Url;
+        InputUrl.text = UrlFull;
     }
 
     public void GetBlockNumberRequest()
