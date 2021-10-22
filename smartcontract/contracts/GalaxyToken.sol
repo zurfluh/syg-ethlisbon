@@ -3,7 +3,6 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "./helpers/IterableMapping.sol";
 
 contract GalaxyToken is ERC1155 {
 
@@ -12,17 +11,20 @@ contract GalaxyToken is ERC1155 {
     // address of owner of the token
     address private _owner;
 
-    // // spaceship nonce
-    // uint256 internal spaceshipNonce;
-    
-    // // planet nonce
-    // uint256 internal planetNonce;
+    // token nonce
+    uint256 internal nonce;
 
-    // // The top bit is a flag to tell if this is a spaceship NFI.
-    // uint256 internal constant TYPE_SpaceShip_BIT = 1 << 255;
-    
-    // // The 2nd top bit is a flag to tell if this is a planet NFI.
-    // uint256 internal constant TYPE_Planet_BIT = 1 << 254;
+    // The top bit is a flag to tell if this is a NFI.
+    uint256 internal constant TYPE_NF_BIT = 1 << 255;
+
+    /// Store the type in the upper 128 bits..
+    uint256 constant internal TOKEN_TYPE = uint256(type(uint128).max) << 128;
+
+    /// ..and the non-fungible index in the lower 128
+    uint256 constant internal NF_INDEX = type(uint128).max;
+
+    /// number of tokens under a particular token type
+    mapping(uint256 => uint256) internal maxIndex;
 
     // mapping of nft to owner
     mapping(uint256 => address) private _nfOwners;
@@ -61,8 +63,8 @@ contract GalaxyToken is ERC1155 {
         _;
     }
 
-    modifier isUnlocked(uint256 id) {
-        require (unlockedId[id] != true, "Company did not create this token yet");
+    modifier isUnlocked(uint256 _type) {
+        require (unlockedId[_type] != true, "Company did not create this token yet");
         _;
     }
 
@@ -106,6 +108,16 @@ contract GalaxyToken is ERC1155 {
         return _nfOwners[id];
     }
 
+    /// Returns index of non-fungible token
+    function getNonFungibleIndex(uint256 id) public pure returns(uint256) {
+        return id & NF_INDEX;
+    }
+
+    /// Returns base type of non-fungible token
+    function getNonFungibleTokenType(uint256 id) public pure returns(uint256) {
+        return id & TOKEN_TYPE;
+    }
+
     function transferNfOwner(uint256 id, address to)
         private
         isOwnerOrOperator(id)
@@ -113,128 +125,119 @@ contract GalaxyToken is ERC1155 {
         _nfOwners[id] = to;
     }
 
-    /// @dev creates a new token
-    /// @param isNF is non-fungible token
-    /// @return id_ of token (a unique identifier)
-    function createTokenType(bool isNF) external onlyOwner returns (uint256 id_) {
-        id_ = ++nonce;
+    function createTokenType(bool isNF) external onlyOwner returns (uint256 _type) {
+        // Store the type in the upper 128 bits
+        _type = (++nonce << 128);
 
-        if (isNF) {
-            id_ = id_ | TYPE_NF_BIT;
-        }
+        // Set a flag if this is an NFT.
+        if (isNF)
+          _type = _type | TYPE_NF_BIT;
 
-        // emit a Transfer event with Create semantic to help with discovery.
-        emit tokenCreation(msg.sender, id_);
     }
 
     function nonFungibleMint(
         address account,
-        uint256 id,
+        uint256 _type,
         string memory tokenURI
-    ) internal isAlreadyOwned(id){
+    ) internal {
         require(
-            isNonFungible(id),
+            isNonFungible(_type),
             "TRIED_TO_MINT_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
 
-        transferNfOwner(id, account);
+        uint256 index = ++_totalSupply[_type];
 
-        _totalSupply[id] = 1;
+        uint256 id = _type | index;
+        
+        transferNfOwner(id, account);
 
         tokenMetadata[id] = tokenURI;
 
-        emit nfTokenMint(account, id);
+        emit NfTokenMint(account, id);
     }
 
     function fungibleMint(
         address account,
-        uint256 id,
+        uint256 _type,
         uint256 amount,
         bytes memory data
-    ) public isOwnerOrOperator(id) returns(bool){
+    ) public isOwnerOrOperator(_type) returns(bool){
         require(
-            isFungible(id),
+            isFungible(_type),
             "TRIED_TO_MINT_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
-        super._mint(account, id, amount, data);
-        if(isHolder[id][account]){
-            _totalSupply[id] += amount;
-        return _holderAmount[id].increase(account,amount);
-        
-        }
-        else{
-          _totalSupply[id] += amount;
-          isHolder[id][account]  = true;
-          return _holderAmount[id].insert(account,amount);
-        }
-
+        super._mint(account, _type, amount, data);
+        _totalSupply[_type] += amount;
+        _holderAmount[account][_type] += amount;
+        return true;
     }
 
     function fungibleBurn(
         address account,
-        uint256 id,
+        uint256 _type,
         uint256 amount
-    ) public isOwnerOrOperator(id) returns(bool){
+    ) public isOwnerOrOperator(_type) returns(bool){
         require(
-            isFungible(id),
+            isFungible(_type),
             "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
-        super._burn(account, id, amount);
-        _totalSupply[id] -= amount;
-        return _holderAmount[id].reduce(account,amount);
+        super._burn(account, _type, amount);
+        _totalSupply[_type] -= amount;
+        _holderAmount[account][_type] -= amount;
+        return true;
     }
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public virtual override(ERC1155) {
-        require(
-            from == _msgSender() || isApprovedForAll(from, _msgSender()),
-            "ERC1155: caller is not owner nor approved"
-        );
+    // function safeTransferFrom(
+    //     address from,
+    //     address to,
+    //     uint256 id,
+    //     uint256 amount,
+    //     bytes memory data
+    // ) public virtual override(ERC1155) {
+    //     require(
+    //         from == _msgSender() || isApprovedForAll(from, _msgSender()),
+    //         "ERC1155: caller is not owner nor approved"
+    //     );
 
-        if (isFungible(id)) {
-            super._safeTransferFrom(from, to, id, amount, data);
-            _holderAmount[id].reduce(from,amount);
-            _holderAmount[id].increase(to,amount);
-            return;
-        } else {
-            require(getNfOwner(id) == from, "Wrong NFT owner");
-            transferNfOwner(id, to);
-        }
-    }
+    //     if (isFungible(id)) {
+    //         super._safeTransferFrom(from, to, id, amount, data);
+    //         _holderAmount[id].reduce(from,amount);
+    //         _holderAmount[id].increase(to,amount);
+    //         return;
+    //     } else {
+    //         require(getNfOwner(id) == from, "Wrong NFT owner");
+    //         transferNfOwner(id, to);
+    //     }
+    // }
 
-    function provideDividend(uint256 id) public payable onlyOwner {
-        require(
-            isFungible(id),
-            "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
-        );
-        uint256 dividend = msg.value;
-        address account;
-        uint256 value;
-        uint256 dividendShare;
-        for (uint256 i=1;_holderAmount[id].valid(i);i+=1){
-            (account, value) = _holderAmount[id].get(i);
-            dividendShare = value.div(_totalSupply[id]).mul(dividend);
-            _claimableAmount[id].insert(account,dividendShare * 100);
-        }
+    // function provideDividend(uint256 id) public payable onlyOwner {
+    //     require(
+    //         isFungible(id),
+    //         "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
+    //     );
+    //     uint256 dividend = msg.value;
+    //     address account;
+    //     uint256 value;
+    //     uint256 dividendShare;
+    //     for (uint256 i=1;_holderAmount[id].valid(i);i+=1){
+    //         (account, value) = _holderAmount[id].get(i);
+    //         dividendShare = value.div(_totalSupply[id]).mul(dividend);
+    //         _claimableAmount[id].insert(account,dividendShare * 100);
+    //     }
 
-        emit ownerCredited(id, dividend);
-    }
+    //     emit ownerCredited(id, dividend);
+    // }
 
-    function dividendClaim(address account, uint256 id) public payable{
-        require(
-            isFungible(id),
-            "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
-        );
-        uint256 keyIndex = _claimableAmount[id].getKeyIndex(account);
-        (,uint256 value)= _claimableAmount[id].get(keyIndex);
-        _claimableAmount[id].reduce(account,value);
-        payable(account).transfer(value);
-    }
+    // function dividendClaim(address account, uint256 id) public payable{
+    //     require(
+    //         isFungible(id),
+    //         "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
+    //     );
+    //     uint256 keyIndex = _claimableAmount[id].getKeyIndex(account);
+    //     (,uint256 value)= _claimableAmount[id].get(keyIndex);
+    //     _claimableAmount[id].reduce(account,value);
+    //     payable(account).transfer(value);
+    // }
 
 
 }
