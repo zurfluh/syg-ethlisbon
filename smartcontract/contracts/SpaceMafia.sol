@@ -35,8 +35,8 @@ contract SpaceMafia is Ownable {
     // Count the number of attacks
     uint256 public nukeCount;
 
-    mapping(uint256 => uint256) stakedEth; // This also represents the APR
-    mapping(uint256 => uint256) lastStakedTime;
+    mapping(uint256 => uint256) public stakedEth; // This also represents the APR
+    mapping(uint256 => uint256) public lastStakedTime;
 
 
     struct Nuke { 
