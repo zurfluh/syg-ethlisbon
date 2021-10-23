@@ -79,7 +79,6 @@ public class PlanetManager : MonoBehaviour
         if (numberRockets > 0)
         {
             GameObject go = GameObject.Find(planetName);
-            Debug.Log(go.transform.position);
             Spaceship[] sp = GetComponentsInChildren<Spaceship>();
             foreach (Spaceship s in sp)
             {
