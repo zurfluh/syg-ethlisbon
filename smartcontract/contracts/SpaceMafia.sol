@@ -48,6 +48,10 @@ contract SpaceMafia is Ownable {
     mapping(uint256 => Nuke) nukes;
 
     constructor()  {
+        
+    }
+
+    function initialize() public  {
         galaxyToken = new GalaxyToken();
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);

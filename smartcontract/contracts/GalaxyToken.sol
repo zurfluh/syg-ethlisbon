@@ -40,7 +40,7 @@ contract GalaxyToken is ERC1155 {
 
     constructor() ERC1155("GalaxyToken") {
         _owner = msg.sender;
-        ERC1155.setApprovalForAll(msg.sender,true);
+        // ERC1155.setApprovalForAll(msg.sender,true);
     }
 
     /***********************************|
