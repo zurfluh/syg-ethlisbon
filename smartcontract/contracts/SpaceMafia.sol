@@ -47,8 +47,8 @@ contract SpaceMafia is Ownable {
     // Staked value for each attack
     mapping(uint256 => Nuke) nukes;
 
-    constructor(address _galaxyToken)  {
-        galaxyToken = GalaxyToken(_galaxyToken);
+    constructor()  {
+        galaxyToken = new GalaxyToken();
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);

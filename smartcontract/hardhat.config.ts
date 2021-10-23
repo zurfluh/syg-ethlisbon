@@ -56,7 +56,7 @@ const config: HardhatUserConfig = {
   etherscan: {
     apiKey: "MAYQK87FDX6JCJS4DVW4NKIJ9H76XGNFCA",
   },
-  namedAccounts:{
+  namedAccounts: {
     deployer:0,
     tokenOwner:1,
   }
