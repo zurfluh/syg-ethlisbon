@@ -22,7 +22,7 @@ contract SpaceMafia is Ownable {
     // Mafia ERC20 Token
     uint256 public mafiaToken;
 
-    mapping(uint256 => uint256) stakedEth;
+    mapping(uint256 => uint256) stakedEth; // This also represents the APR
     mapping(uint256 => uint) lastStakedTime;
 
     constructor(address _galaxyToken)  {
@@ -71,6 +71,15 @@ contract SpaceMafia is Ownable {
         uint256 _settledAmount = galaxyToken.claimableAmount(_owner, mafiaToken);
         uint256 _pendingAmount = _getPendingClaimableAmount(_tokenId);
         return _settledAmount.add(_pendingAmount);
+    }
+
+    function claimDividends(
+        uint256 _tokenId
+    ) public planetExist(_tokenId) returns(uint256) {
+        address _owner = galaxyToken.getNfOwner(_tokenId);
+        galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
+        lastStakedTime[_tokenId] = block.timestamp;
+        galaxyToken.dividendClaim(mafiaToken, _owner);
     }
 
 
