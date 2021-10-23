@@ -7,9 +7,11 @@ public class Scene1Manager : MonoBehaviour
 {
     public Text planetName;
     public Text planetOwner;
-    public GameObject selected;
+
+    private GameObject selected;
+    private PlanetManager selectedPM;
     private string selectedName;
-    public Vector3[] sizes;
+    private Vector3[] sizes;
     
     void Awake()
     {
@@ -39,6 +41,7 @@ public class Scene1Manager : MonoBehaviour
                 child.gameObject.SetActive(true);
 
                 PlanetManager pm = selected.gameObject.GetComponent<PlanetManager>();
+                this.selectedPM = pm;
                 float eth = pm.GetStakedEth();
                 
                 // UI Texts
@@ -58,5 +61,20 @@ public class Scene1Manager : MonoBehaviour
                 sr.color = color;
             }
         }
+    }
+
+    public void ClaimRewards()
+    {
+        this.selectedPM.ClaimRewards();
+    }
+
+    public void StakeEther(float amount)
+    {
+        this.selectedPM.StakeEther(1f);
+    }
+
+    public void AddRocket()
+    {
+        this.selectedPM.AddRocket();
     }
 }
