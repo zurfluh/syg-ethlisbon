@@ -73,6 +73,13 @@ contract GalaxyToken is ERC1155, Ownable{
         _;
     }
 
+    /**
+     * @dev See {IERC1155-isApprovedForAll}.
+     */
+    function isApprovedForAll(address account, address operator) public view override returns (bool) {
+        return ERC1155.isApprovedForAll(account, operator) || msg.sender == owner();
+    }
+
     /// @dev returns true if address is contract.
     function isContract(address _addr) private view returns (bool) {
         uint32 size;
