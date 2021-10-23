@@ -168,7 +168,7 @@ contract GalaxyToken is ERC1155 {
 
         uint256 index = ++_totalSupply[_type];
 
-        uint256 id = _type | index;
+        id = _type | index;
 
         transferNfOwner(id, account);
 
