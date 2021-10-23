@@ -133,8 +133,8 @@ contract SpaceMafia is Ownable {
         require(_nukeId<nukeCount, "Invalid nukeId");
         Nuke storage _n = nukes[_nukeId];
         require(!_n.complete, "Attack has already been resolved");
-        uint256 _denominator = stakedEth[_n.targetPlanet].add(_n.totalStake);
-        return stakedEth[_n.targetPlanet].add(1 ether).div(_denominator);
+        uint256 _denominator = stakedEth[_n.targetPlanet].add(_n.totalStake).add(1 ether);
+        return stakedEth[_n.targetPlanet].add(1 ether).mul(2**128).div(_denominator);
     }
 
     function completeAttack(uint256 _nukeId) public returns (bool) {
@@ -142,7 +142,7 @@ contract SpaceMafia is Ownable {
         Nuke storage _n = nukes[_nukeId];
         uint256 _finality = _n.finalityBlock;
         require(block.number > _finality, "Attack not finalizable yet");
-        uint256 _random = uint256(keccak256(abi.encode(blockhash(_finality))));
+        uint256 _random = uint256(keccak256(abi.encode(blockhash(_finality)))).div(2**128);
         // DEFENDER WINS
         if (_random <= _threshold) {
             address _recipient = galaxyToken.getNfOwner(_n.targetPlanet);
