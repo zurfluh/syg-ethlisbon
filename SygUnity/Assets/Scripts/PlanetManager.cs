@@ -1,33 +1,68 @@
+using Nethereum.RPC.Eth.DTOs;
+using Nethereum.Web3;
+using SygEthlisbon.Contracts.SpaceMafia;
+using SygEthlisbon.Contracts.SpaceMafia.ContractDefinition;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class PlanetManager : MonoBehaviour
 {
     public GameObject rocketPrefab;
 
-    public float GetStakedEth()
+    public async Task<System.Numerics.BigInteger> GetStakedEth(System.Numerics.BigInteger planetId)
     {
-        return Random.Range(0f, 10.0f);
+        var web3 = new Web3(GameManager.Instance.InfuraUrl);
+        var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
+        var staked = await spaceMafiaService.StakedEthQueryAsync(planetId);
+
+        return staked;
     }
 
-    public string GetOwnerAddress()
+    public async Task<string> GetOwnerAddress(System.Numerics.BigInteger planetId)
     {
-        return "0x5e4B3104B8Da480990CD0df17784ae300790AcdB";
+        var web3 = new Web3(GameManager.Instance.InfuraUrl);
+        var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
+        var planet = await spaceMafiaService.GetPlanetQueryAsync(planetId);
+
+        return planet.ReturnValue1;
     }
 
-    public void ClaimRewards()
+    public async Task ClaimRewards(System.Numerics.BigInteger planetId)
     {
         Debug.Log("rewards");
+
+        var web3 = new Web3(GameManager.Instance.InfuraUrl);
+        var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
+
+        var claimDividendsFunction = spaceMafiaService.ContractHandler.GetFunction<ClaimDividendsFunction>();
+
+        var currentNonce = await web3.Eth.Transactions.GetTransactionCount.SendRequestAsync("0x54782", BlockParameter.CreatePending());
+        Debug.Log("Current nonce: " + currentNonce);
+
+        var transactionInput = claimDividendsFunction.CreateTransactionInput(new ClaimDividendsFunction
+        {
+            Nonce = currentNonce.Value + 1,
+            TokenId = planetId
+        }, "0x0");
+
+        Debug.Log("Transaction input: " + transactionInput);
+
+        string rawTx = transactionInput.Data;
+        Debug.Log("Raw transaction: " + rawTx);
+        // TODO: Sign and send trx by external wallet.
     }
 
-    public void StakeEther(float amount)
+    public async Task StakeEther(System.Numerics.BigInteger planetId, float amount)
     {
         Debug.Log("stake" + amount);
     }
 
-    public void AddRocket()
+    public async Task AddRocket(System.Numerics.BigInteger planetId)
     {
+        Debug.Log("add rocket");
+
         GameObject go = Instantiate(rocketPrefab, transform);
     }
 }

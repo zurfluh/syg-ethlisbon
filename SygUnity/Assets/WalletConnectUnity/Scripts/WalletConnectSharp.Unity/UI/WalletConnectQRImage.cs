@@ -31,6 +31,8 @@ public class WalletConnectQRImage : BindableMonoBehavior
 
     private void WalletConnectOnConnectionStarted(object sender, EventArgs e)
     {
+        if (_image == null) return;
+
         var url = walletConnect.Session.URI;
         
         Debug.Log("URL for wallet connect: " + url);

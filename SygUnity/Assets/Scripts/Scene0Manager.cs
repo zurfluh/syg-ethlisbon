@@ -12,6 +12,7 @@ public class Scene0Manager : MonoBehaviour
         GameManager.Instance.InfuraUrl = this.InfuraURL.text;
         GameManager.Instance.GalaxyTokenContractAddress = this.GalaxyTokenAddress.text;
         GameManager.Instance.SpaceMafiaContractAddress = this.SpaceMafiaAddress.text;
+
         SceneManager.LoadScene("Scene1");
     }
 }
