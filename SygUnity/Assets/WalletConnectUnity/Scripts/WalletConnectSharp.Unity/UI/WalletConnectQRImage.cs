@@ -33,7 +33,7 @@ public class WalletConnectQRImage : BindableMonoBehavior
     {
         var url = walletConnect.Session.URI;
         
-        Debug.Log(url);
+        Debug.Log("URL for wallet connect: " + url);
         
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
         QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
