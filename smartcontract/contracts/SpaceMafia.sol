@@ -1,10 +1,12 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.4;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./GalaxyToken.sol";
+import "./aave-helper/ILendingPoolAddressesProvider.sol";
+import "./aave-helper/ILendingPool.sol";
 
 contract SpaceMafia is Ownable {
 
@@ -24,6 +26,9 @@ contract SpaceMafia is Ownable {
     uint256 public rocketType;
     // Mafia ERC20 Token
     uint256 public mafiaToken;
+
+    address public lendingpool;
+
 
     // Count the number of attacks
     uint256 public nukeCount;
@@ -47,6 +52,11 @@ contract SpaceMafia is Ownable {
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
+        lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
+    }
+
+    function depositInAAVE(uint256 amount) public payable{
+        ILendingPool(lendingpool).deposit(address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE), amount, address(this), 0);
     }
 
     modifier planetExists(uint256 _tokenId) {
@@ -86,6 +96,7 @@ contract SpaceMafia is Ownable {
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         stakedEth[_tokenId] = stakedEth[_tokenId].add(msg.value);
+        depositInAAVE(msg.value);
         lastStakedTime[_tokenId] = block.timestamp;
         return true;
     }
@@ -162,7 +173,5 @@ contract SpaceMafia is Ownable {
         _n.complete=true;
         return true;
     }
-
-
 
 }
