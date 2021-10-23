@@ -138,8 +138,7 @@ contract SpaceMafia is Ownable {
     function _getPendingClaimableAmount(uint256 _tokenId) internal view returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
             uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
-            uint256 claimMultiplier = _delta.div(APR_TIME_PERIOD) > 10 ? 10 : _delta.div(APR_TIME_PERIOD);
-            _amount = stakedEth[_tokenId].mul(claimMultiplier);
+            _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
         }
         return _amount;
     }
