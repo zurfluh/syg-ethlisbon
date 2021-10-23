@@ -1,8 +1,8 @@
 pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
-import "./open-zeppelin/utils/math/SafeMath.sol";
-import "./open-zeppelin/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./GalaxyToken.sol";
 
@@ -38,10 +38,10 @@ contract SpaceMafia is Ownable {
         _;
     }
 
-    function _getPendingClaimableAmount(_tokenId) internal returns(uint256 _amount) {
+    function _getPendingClaimableAmount(uint256 _tokenId) internal returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
             address _owner = galaxyToken.getNfOwner(_tokenId);
-            uint256 _delta = now - lastStakedTime[_tokenId];
+            uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
             _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
         }
         return _amount;
@@ -49,7 +49,7 @@ contract SpaceMafia is Ownable {
 
     function mintPlanet(
         address _account,
-        string _tokenURI
+        string memory _tokenURI
     ) public onlyOwner() returns(uint256 _id){
         _id = galaxyToken.nonFungibleMint(_account, planetType, _tokenURI);
     }
@@ -61,7 +61,7 @@ contract SpaceMafia is Ownable {
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         stakedEth[_tokenId] = stakedEth[_tokenId].add(msg.value);
-        lastStakedTime[_tokenId] = now;
+        lastStakedTime[_tokenId] = block.timestamp;
         return true;
     }
 
