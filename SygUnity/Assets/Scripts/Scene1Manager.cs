@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Scene1Manager : MonoBehaviour
 {
+    public GameObject menuPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +21,7 @@ public class Scene1Manager : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(mousePos2D, Vector2.zero);
             if (hit.collider != null) {
                 Debug.Log(hit.collider.gameObject.name);
+                Instantiate(menuPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             }
         }
     }
