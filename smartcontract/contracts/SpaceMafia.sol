@@ -10,7 +10,7 @@ contract SpaceMafia is Ownable {
 
     using SafeMath for uint256;
 
-    uint256 APR_TIME_PERIOD = 1 weeks; 
+    uint256 constant APR_TIME_PERIOD = 1 weeks; 
 
     // ERC1155 Token interface
     GalaxyToken public galaxyToken;
@@ -38,9 +38,8 @@ contract SpaceMafia is Ownable {
         _;
     }
 
-    function _getPendingClaimableAmount(uint256 _tokenId) internal returns(uint256 _amount) {
+    function _getPendingClaimableAmount(uint256 _tokenId) internal view returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
-            address _owner = galaxyToken.getNfOwner(_tokenId);
             uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
             _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
         }
@@ -67,7 +66,7 @@ contract SpaceMafia is Ownable {
 
     function claimableDividends(
         uint256 _tokenId
-    ) public planetExist(_tokenId) returns(uint256){
+    ) public view planetExist(_tokenId) returns(uint256){
         address _owner = galaxyToken.getNfOwner(_tokenId);
         uint256 _settledAmount = galaxyToken.claimableAmount(_owner, mafiaToken);
         uint256 _pendingAmount = _getPendingClaimableAmount(_tokenId);
