@@ -7,6 +7,7 @@ public class Scene1Manager : MonoBehaviour
 {
     public Text planetName;
     public Text planetOwner;
+    public Dropdown dropdown;
 
     private GameObject selected;
     private PlanetManager selectedPM;
@@ -76,5 +77,10 @@ public class Scene1Manager : MonoBehaviour
     public void AddRocket()
     {
         this.selectedPM.AddRocket();
+    }
+
+    public void Attack()
+    {
+        this.selectedPM.Attack(dropdown.options[dropdown.value].text);
     }
 }
