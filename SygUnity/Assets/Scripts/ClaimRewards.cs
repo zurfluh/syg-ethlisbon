@@ -14,7 +14,7 @@ public class ClaimRewards : MonoBehaviour
         //
     }
 
-    public async void CallSomeFunction()
+    public async void ClaimRewardsAsync()
     {
         var web3 = new Web3(GameManager.Instance.InfuraUrl);
         var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
