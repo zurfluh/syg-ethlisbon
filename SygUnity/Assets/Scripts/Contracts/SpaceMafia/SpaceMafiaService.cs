@@ -125,6 +125,32 @@ namespace SygEthlisbon.Contracts.SpaceMafia
             return ContractHandler.QueryAsync<DefenseProbabilityFunction, BigInteger>(defenseProbabilityFunction, blockParameter);
         }
 
+        public Task<string> DepositInAAVERequestAsync(DepositInAAVEFunction depositInAAVEFunction)
+        {
+             return ContractHandler.SendRequestAsync(depositInAAVEFunction);
+        }
+
+        public Task<TransactionReceipt> DepositInAAVERequestAndWaitForReceiptAsync(DepositInAAVEFunction depositInAAVEFunction, CancellationTokenSource cancellationToken = null)
+        {
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(depositInAAVEFunction, cancellationToken);
+        }
+
+        public Task<string> DepositInAAVERequestAsync(BigInteger amount)
+        {
+            var depositInAAVEFunction = new DepositInAAVEFunction();
+                depositInAAVEFunction.Amount = amount;
+            
+             return ContractHandler.SendRequestAsync(depositInAAVEFunction);
+        }
+
+        public Task<TransactionReceipt> DepositInAAVERequestAndWaitForReceiptAsync(BigInteger amount, CancellationTokenSource cancellationToken = null)
+        {
+            var depositInAAVEFunction = new DepositInAAVEFunction();
+                depositInAAVEFunction.Amount = amount;
+            
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(depositInAAVEFunction, cancellationToken);
+        }
+
         public Task<string> GalaxyTokenQueryAsync(GalaxyTokenFunction galaxyTokenFunction, BlockParameter blockParameter = null)
         {
             return ContractHandler.QueryAsync<GalaxyTokenFunction, string>(galaxyTokenFunction, blockParameter);
@@ -134,6 +160,43 @@ namespace SygEthlisbon.Contracts.SpaceMafia
         public Task<string> GalaxyTokenQueryAsync(BlockParameter blockParameter = null)
         {
             return ContractHandler.QueryAsync<GalaxyTokenFunction, string>(null, blockParameter);
+        }
+
+        public Task<string> InitializeRequestAsync(InitializeFunction initializeFunction)
+        {
+             return ContractHandler.SendRequestAsync(initializeFunction);
+        }
+
+        public Task<TransactionReceipt> InitializeRequestAndWaitForReceiptAsync(InitializeFunction initializeFunction, CancellationTokenSource cancellationToken = null)
+        {
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(initializeFunction, cancellationToken);
+        }
+
+        public Task<string> InitializeRequestAsync(string galaxyToken)
+        {
+            var initializeFunction = new InitializeFunction();
+                initializeFunction.GalaxyToken = galaxyToken;
+            
+             return ContractHandler.SendRequestAsync(initializeFunction);
+        }
+
+        public Task<TransactionReceipt> InitializeRequestAndWaitForReceiptAsync(string galaxyToken, CancellationTokenSource cancellationToken = null)
+        {
+            var initializeFunction = new InitializeFunction();
+                initializeFunction.GalaxyToken = galaxyToken;
+            
+             return ContractHandler.SendRequestAndWaitForReceiptAsync(initializeFunction, cancellationToken);
+        }
+
+        public Task<string> LendingpoolQueryAsync(LendingpoolFunction lendingpoolFunction, BlockParameter blockParameter = null)
+        {
+            return ContractHandler.QueryAsync<LendingpoolFunction, string>(lendingpoolFunction, blockParameter);
+        }
+
+        
+        public Task<string> LendingpoolQueryAsync(BlockParameter blockParameter = null)
+        {
+            return ContractHandler.QueryAsync<LendingpoolFunction, string>(null, blockParameter);
         }
 
         public Task<BigInteger> MafiaTokenQueryAsync(MafiaTokenFunction mafiaTokenFunction, BlockParameter blockParameter = null)

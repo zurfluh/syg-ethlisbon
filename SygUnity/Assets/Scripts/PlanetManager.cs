@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlanetManager : MonoBehaviour
 {
+    public GameObject rocketPrefab;
 
     public float GetStakedEth()
     {
@@ -27,6 +28,6 @@ public class PlanetManager : MonoBehaviour
 
     public void AddRocket()
     {
-        Debug.Log("rocket");
+        GameObject go = Instantiate(rocketPrefab, transform);
     }
 }
