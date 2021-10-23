@@ -451,7 +451,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: https://mainnet.infura.io/v3/8641c45d947a4e159304a56bdad174e2
+  m_Text: https://goerli.infura.io/v3/8641c45d947a4e159304a56bdad174e2
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -844,7 +844,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: https://mainnet.infura.io/v3/8641c45d947a4e159304a56bdad174e2
+  m_Text: https://goerli.infura.io/v3/8641c45d947a4e159304a56bdad174e2
 --- !u!222 &1865876766
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -882,7 +882,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8815a385d2770460094368f8e983c9ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InfuraUrl: 
 --- !u!4 &1939962485
 Transform:
   m_ObjectHideFlags: 0
