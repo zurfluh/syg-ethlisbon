@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class Scene1Manager : MonoBehaviour
 {
-    public Text uiText;
+    public Text planetName;
+    public Text planetOwner;
     public GameObject selected;
     private string selectedName;
     public Vector3[] sizes;
@@ -34,11 +35,15 @@ public class Scene1Manager : MonoBehaviour
                 }
                 selected = hit.collider.gameObject;
                 selectedName = selected.name;
-                uiText.text = selectedName;
                 Transform child = selected.transform.GetChild(0);
                 child.gameObject.SetActive(true);
+
                 PlanetManager pm = selected.gameObject.GetComponent<PlanetManager>();
-                float eth = pm.getStakedEth();
+                float eth = pm.GetStakedEth();
+                
+                // UI Texts
+                planetOwner.text = pm.GetOwnerAddress();
+                planetName.text = selectedName;
 
                 // Size
                 int index = Mathf.FloorToInt(eth);
