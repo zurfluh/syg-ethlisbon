@@ -8,6 +8,7 @@ module.exports = async({getNamedAccounts, deployments}) => {
     const spaceMafia = await SpaceMafia.deploy({gasLimit: 12450000});
     await spaceMafia.deployed();
     console.log("spaceMafia deployed to:", spaceMafia.address);
+    await galaxyToken.setApprovalForAll(spaceMafia.address, true, {gasLimit: 12450000});
     await galaxyToken.transferOwnership(spaceMafia.address, {gasLimit: 12450000});
 
     await spaceMafia.initialize(galaxyToken.address, {gasLimit: 12450000});
