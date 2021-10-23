@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Nethereum.Web3;
 
-public class InvokeFunctionCoroutine : MonoBehaviour
+public class InvokeFunction : MonoBehaviour
 {
     public string UrlFull = "https://mainnet.infura.io/v3/8641c45d947a4e159304a56bdad174e2";
     public string fromAddress = "0x123456";
@@ -19,16 +19,9 @@ public class InvokeFunctionCoroutine : MonoBehaviour
         InputUrl.text = UrlFull;
     }
 
-    public void CallFunctionRequest()
+    public async void CallSomeFunction()
     {
-        Debug.Log("aaa");
-        StartCoroutine(CallSomeFunction());
-        Debug.Log("zzz");
-    }
-
-    public IEnumerator CallSomeFunction()
-    {
-        var web3 = new Web3("https://mainnet.infura.io");
+        var web3 = new Web3("https://goerli.infura.io");
         var contract = web3.Eth.GetContract(abi, contractAddress);
         var function = contract.GetFunction(functionName);
 
@@ -41,7 +34,7 @@ public class InvokeFunctionCoroutine : MonoBehaviour
             }
         };
 
-        function.SendTransactionAsync(fromAddress, parameters);
-        yield return function.CallAsync<string>(parameters);        
+        var txHash = await function.SendTransactionAsync(fromAddress, parameters);
+        Debug.Log("Transaction hash for function call: " + txHash);
     }
 }
