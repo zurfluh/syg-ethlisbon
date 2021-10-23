@@ -35,8 +35,13 @@ contract SpaceMafia is Ownable {
     // Count the number of attacks
     uint256 public nukeCount;
 
-    mapping(uint256 => uint256) stakedEth; // This also represents the APR
-    mapping(uint256 => uint256) lastStakedTime;
+    mapping(uint256 => uint256) public stakedEth; // This also represents the APR
+    mapping(uint256 => uint256) public lastStakedTime;
+
+
+    // selectors for receiver callbacks
+    bytes4 constant public ERC1155_RECEIVED       = 0xf23a6e61;
+    bytes4 constant public ERC1155_BATCH_RECEIVED = 0xbc197c81;
 
 
     struct Nuke { 
@@ -48,7 +53,7 @@ contract SpaceMafia is Ownable {
         bool complete;
     }
     // Staked value for each attack
-    mapping(uint256 => Nuke) nukes;
+    mapping(uint256 => Nuke) public nukes;
 
     constructor()  {
     }
@@ -59,8 +64,7 @@ contract SpaceMafia is Ownable {
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
-        galaxyToken.setApprovalForAll(msg.sender, true);
-        galaxyToken.addOperator(msg.sender, planetType);
+        // galaxyToken.addOperator(msg.sender, planetType);
         initialized = true;
         // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
     }
@@ -138,8 +142,7 @@ contract SpaceMafia is Ownable {
     function _getPendingClaimableAmount(uint256 _tokenId) internal view returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
             uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
-            uint256 claimMultiplier = _delta.div(APR_TIME_PERIOD) > 10 ? 10 : _delta.div(APR_TIME_PERIOD);
-            _amount = stakedEth[_tokenId].mul(claimMultiplier);
+            _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
         }
         return _amount;
     }
@@ -212,6 +215,26 @@ contract SpaceMafia is Ownable {
         uint256 _numerator = stakedEth[_n.targetPlanet].add(1 ether);
         uint256 _denominator = stakedEth[_n.targetPlanet].add(_n.totalStake).add(1 ether);
         return getThreshold(_numerator, _denominator);
+    }
+
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) external returns (bytes4){
+        return ERC1155_RECEIVED;
+    }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external returns (bytes4){
+        return ERC1155_BATCH_RECEIVED;
     }
 
     function completeAttack(uint256 _nukeId) public isNukeValid(_nukeId) returns (bool) {
