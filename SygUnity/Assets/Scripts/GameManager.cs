@@ -6,7 +6,6 @@ public class GameManager : MonoBehaviour
 {
     public string InfuraUrl { get; set; }
 
-
     private static GameManager _Instance;
     public static GameManager Instance
     {
