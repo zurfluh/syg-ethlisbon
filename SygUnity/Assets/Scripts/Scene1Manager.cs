@@ -9,6 +9,7 @@ public class Scene1Manager : MonoBehaviour
 {
     public Text planetName;
     public Text planetOwner;
+    public Dropdown dropdown;
     public Text StakeAmount;
 
     private GameObject selected;
@@ -104,5 +105,10 @@ public class Scene1Manager : MonoBehaviour
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
         this.selectedPM.AddRocket(planetId);
+    }
+
+    public void Attack()
+    {
+        this.selectedPM.Attack(dropdown.options[dropdown.value].text);
     }
 }
