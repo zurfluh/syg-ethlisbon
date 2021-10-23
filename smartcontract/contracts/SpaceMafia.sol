@@ -64,7 +64,8 @@ contract SpaceMafia is Ownable {
     function _getPendingClaimableAmount(uint256 _tokenId) internal view returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
             uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
-            _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
+            uint256 claimMultiplier = _delta.div(APR_TIME_PERIOD) > 10 ? 10 : _delta.div(APR_TIME_PERIOD);
+            _amount = stakedEth[_tokenId].mul(claimMultiplier);
         }
         return _amount;
     }
@@ -79,6 +80,8 @@ contract SpaceMafia is Ownable {
     function stakeEthOnPlanet(
         uint256 _tokenId
     ) public payable planetExists(_tokenId) returns(bool){
+
+        require(msg.value > 0, "No staking amount is mentioned");
         address _owner = galaxyToken.getNfOwner(_tokenId);
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
@@ -159,5 +162,7 @@ contract SpaceMafia is Ownable {
         _n.complete=true;
         return true;
     }
+
+
 
 }
