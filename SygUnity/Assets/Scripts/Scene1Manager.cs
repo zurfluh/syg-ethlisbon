@@ -1,5 +1,7 @@
-using System.Collections;
+using Nethereum.Web3;
+using SygEthlisbon.Contracts.SpaceMafia;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,13 +9,25 @@ public class Scene1Manager : MonoBehaviour
 {
     public Text planetName;
     public Text planetOwner;
+    public Text StakeAmount;
 
     private GameObject selected;
     private PlanetManager selectedPM;
     private string selectedName;
+    private int selectedOffset;
     private Vector3[] sizes;
+    private System.Numerics.BigInteger basePlanetId;
+
+    private Dictionary<string, int> planetOffsets = new Dictionary<string, int>
+    {
+        { "Bob", 1 },
+        { "Satoland", 2 },
+        { "Aurum", 3 },
+        { "Magnus", 4 },
+        { "Helius", 5 },
+    };
     
-    void Awake()
+    async Task Awake()
     {
         selectedName = "";
         sizes = new Vector3[10];
@@ -22,6 +36,12 @@ public class Scene1Manager : MonoBehaviour
             float f = 0.25f + i * 0.07f;
             sizes[i] = new Vector3(f, f, f);
         }
+
+        // Get Planet IDs
+        var web3 = new Web3(GameManager.Instance.InfuraUrl);
+        var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
+
+        basePlanetId = await spaceMafiaService.PlanetTypeQueryAsync();
     }
 
     void Update()
@@ -37,44 +57,52 @@ public class Scene1Manager : MonoBehaviour
                 }
                 selected = hit.collider.gameObject;
                 selectedName = selected.name;
+                selectedOffset = planetOffsets[selectedName];
                 Transform child = selected.transform.GetChild(0);
                 child.gameObject.SetActive(true);
 
                 PlanetManager pm = selected.gameObject.GetComponent<PlanetManager>();
                 this.selectedPM = pm;
-                float eth = pm.GetStakedEth();
-                
-                // UI Texts
-                planetOwner.text = pm.GetOwnerAddress();
-                planetName.text = selectedName;
+                System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
+                StartCoroutine(new UpdatePlanetInfoCoroutine().UpdatePlanetInfo(planetId, pm, selectedName));
 
-                // Size
-                int index = Mathf.FloorToInt(eth);
-                child.transform.localScale = sizes[index];
+                //System.Numerics.BigInteger eth = await pm.GetStakedEth(planetId);
+                                
+                //// UI Texts
+                //planetOwner.text = await pm.GetOwnerAddress(planetId);
+                //planetName.text = selectedName;
+                //StakeAmount.text = eth.ToString();
+
+                //// Size
+                //int index = Mathf.FloorToInt((float)eth);
+                //child.transform.localScale = sizes[index];
 
                 // Color
-                SpriteRenderer sr = child.gameObject.GetComponent<SpriteRenderer>();
-                float r = 0.3f + 0.03f * index;
-                float g = 0.1f * index;
-                float b = 0.2f + 0.06f * index;
-                Color color = new Color(r, g, b);
-                sr.color = color;
+                //SpriteRenderer sr = child.gameObject.GetComponent<SpriteRenderer>();
+                //float r = 0.3f + 0.03f * index;
+                //float g = 0.1f * index;
+                //float b = 0.2f + 0.06f * index;
+                //Color color = new Color(r, g, b);
+                //sr.color = color;
             }
         }
     }
 
-    public void ClaimRewards()
+    public async Task ClaimRewards()
     {
-        this.selectedPM.ClaimRewards();
+        System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
+        await this.selectedPM.ClaimRewards(planetId);
     }
 
-    public void StakeEther(float amount)
+    public async Task StakeEther(float amount)
     {
-        this.selectedPM.StakeEther(1f);
+        System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
+        await this.selectedPM.StakeEther(planetId, 1f);
     }
 
     public void AddRocket()
     {
-        this.selectedPM.AddRocket();
+        System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
+        this.selectedPM.AddRocket(planetId);
     }
 }
