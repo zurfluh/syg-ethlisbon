@@ -4,20 +4,30 @@ using UnityEngine;
 
 public class PlanetManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public GameObject rocketPrefab;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    public float getStakedEth()
+    public float GetStakedEth()
     {
         return Random.Range(0f, 10.0f);
+    }
+
+    public string GetOwnerAddress()
+    {
+        return "0x5e4B3104B8Da480990CD0df17784ae300790AcdB";
+    }
+
+    public void ClaimRewards()
+    {
+        Debug.Log("rewards");
+    }
+
+    public void StakeEther(float amount)
+    {
+        Debug.Log("stake" + amount);
+    }
+
+    public void AddRocket()
+    {
+        GameObject go = Instantiate(rocketPrefab, transform);
     }
 }

@@ -5,10 +5,13 @@ using UnityEngine.UI;
 
 public class Scene1Manager : MonoBehaviour
 {
-    public Text uiText;
-    public GameObject selected;
+    public Text planetName;
+    public Text planetOwner;
+
+    private GameObject selected;
+    private PlanetManager selectedPM;
     private string selectedName;
-    public Vector3[] sizes;
+    private Vector3[] sizes;
     
     void Awake()
     {
@@ -34,11 +37,16 @@ public class Scene1Manager : MonoBehaviour
                 }
                 selected = hit.collider.gameObject;
                 selectedName = selected.name;
-                uiText.text = selectedName;
                 Transform child = selected.transform.GetChild(0);
                 child.gameObject.SetActive(true);
+
                 PlanetManager pm = selected.gameObject.GetComponent<PlanetManager>();
-                float eth = pm.getStakedEth();
+                this.selectedPM = pm;
+                float eth = pm.GetStakedEth();
+                
+                // UI Texts
+                planetOwner.text = pm.GetOwnerAddress();
+                planetName.text = selectedName;
 
                 // Size
                 int index = Mathf.FloorToInt(eth);
@@ -53,5 +61,20 @@ public class Scene1Manager : MonoBehaviour
                 sr.color = color;
             }
         }
+    }
+
+    public void ClaimRewards()
+    {
+        this.selectedPM.ClaimRewards();
+    }
+
+    public void StakeEther(float amount)
+    {
+        this.selectedPM.StakeEther(1f);
+    }
+
+    public void AddRocket()
+    {
+        this.selectedPM.AddRocket();
     }
 }
