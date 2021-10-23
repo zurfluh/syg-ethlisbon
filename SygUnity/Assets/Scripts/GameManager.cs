@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Nethereum.Web3;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
     public string InfuraUrl { get; set; }
+    public string GalaxyTokenContractAddress { get; set; }
+    public string SpaceMafiaContractAddress { get; set; }
 
     private static GameManager _Instance;
     public static GameManager Instance

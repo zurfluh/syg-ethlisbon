@@ -1,14 +1,12 @@
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0 <=0.8.4;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract GalaxyToken is ERC1155 {
+contract GalaxyToken is ERC1155, Ownable{
     using SafeMath for uint256;
-
-    // address of owner of the token
-    address private _owner;
 
     // token nonce
     uint256 internal nonce;
@@ -38,10 +36,7 @@ contract GalaxyToken is ERC1155 {
 
     mapping(uint256 => uint256) public _totalSupply;
 
-    constructor(string memory URI, address owner) ERC1155(URI) {
-        _owner = owner;
-        ERC1155.setApprovalForAll(_owner,true);
-    }
+    constructor() ERC1155("GalaxyToken") { }
 
     /***********************************|
   |             EVENTS                |
@@ -68,15 +63,11 @@ contract GalaxyToken is ERC1155 {
         _;
     }
 
-    modifier onlyOwner() {
-        require(_owner == msg.sender, "You cannot perform this action.");
-        _;
-    }
 
     modifier isOwnerOrOperator(uint256 id) {
         uint256 _type = getNonFungibleTokenType(id);
         require(
-            _owner == msg.sender || operators[_type][msg.sender] == true || address(this) == msg.sender,
+            owner() == msg.sender || operators[_type][msg.sender] == true || address(this) == msg.sender,
             "You cannot perform this action."
         );
         _;
@@ -99,10 +90,6 @@ contract GalaxyToken is ERC1155 {
     /// @dev Returns true if token is fungible
     function isFungible(uint256 id) public pure returns (bool) {
         return id & TYPE_NF_BIT == 0;
-    }
-
-    function Owner() public view returns (address) {
-        return _owner;
     }
 
     function getNfOwner(uint256 id) public view returns (address) {

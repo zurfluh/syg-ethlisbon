@@ -1,10 +1,12 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.4;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./GalaxyToken.sol";
+import "./aave-helper/ILendingPoolAddressesProvider.sol";
+import "./aave-helper/ILendingPool.sol";
 
 contract SpaceMafia is Ownable {
 
@@ -25,6 +27,9 @@ contract SpaceMafia is Ownable {
     // Mafia ERC20 Token
     uint256 public mafiaToken;
 
+    address public lendingpool;
+
+
     // Count the number of attacks
     uint256 public nukeCount;
 
@@ -42,11 +47,19 @@ contract SpaceMafia is Ownable {
     // Staked value for each attack
     mapping(uint256 => Nuke) nukes;
 
-    constructor(address _galaxyToken)  {
+    constructor()  {
+    }
+
+    function initialize(address _galaxyToken) public onlyOwner {
         galaxyToken = GalaxyToken(_galaxyToken);
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
+        // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
+    }
+
+    function depositInAAVE(uint256 amount) public payable{
+        ILendingPool(lendingpool).deposit(address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE), amount, address(this), 0);
     }
 
     modifier planetExists(uint256 _tokenId) {
@@ -64,7 +77,8 @@ contract SpaceMafia is Ownable {
     function _getPendingClaimableAmount(uint256 _tokenId) internal view returns(uint256 _amount) {
         if (lastStakedTime[_tokenId] != 0) {
             uint256 _delta = block.timestamp - lastStakedTime[_tokenId];
-            _amount = stakedEth[_tokenId].mul(_delta).div(APR_TIME_PERIOD);
+            uint256 claimMultiplier = _delta.div(APR_TIME_PERIOD) > 10 ? 10 : _delta.div(APR_TIME_PERIOD);
+            _amount = stakedEth[_tokenId].mul(claimMultiplier);
         }
         return _amount;
     }
@@ -79,10 +93,13 @@ contract SpaceMafia is Ownable {
     function stakeEthOnPlanet(
         uint256 _tokenId
     ) public payable planetExists(_tokenId) returns(bool){
+
+        require(msg.value > 0, "No staking amount is mentioned");
         address _owner = galaxyToken.getNfOwner(_tokenId);
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         stakedEth[_tokenId] = stakedEth[_tokenId].add(msg.value);
+        depositInAAVE(msg.value);
         lastStakedTime[_tokenId] = block.timestamp;
         return true;
     }
