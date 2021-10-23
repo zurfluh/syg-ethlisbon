@@ -1,17 +1,19 @@
-pragma solidity ^0.8.0;
+pragma solidity 0.8.4;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./GalaxyToken.sol";
+import "./aave-helper/ILendingPoolAddressesProvider.sol";
+import "./aave-helper/ILendingPool.sol";
 
 contract SpaceMafia is Ownable {
 
     using SafeMath for uint256;
 
-    uint256 constant APR_TIME_PERIOD = 1 seconds; 
-    uint256 constant ROCKET_COST = 1 ether; 
+    uint256 constant APR_TIME_PERIOD = 1 seconds;
+    uint256 constant ROCKET_COST = 1 ether;
     uint256 constant MINIMUM_MISSION_COST = 1 ether;
     uint256 constant BLOCK_TO_FINALIZATION = 20;
 
@@ -25,6 +27,9 @@ contract SpaceMafia is Ownable {
     // Mafia ERC20 Token
     uint256 public mafiaToken;
 
+    address public lendingpool;
+
+
     // Count the number of attacks
     uint256 public nukeCount;
 
@@ -32,7 +37,7 @@ contract SpaceMafia is Ownable {
     mapping(uint256 => uint256) lastStakedTime;
 
 
-    struct Nuke { 
+    struct Nuke {
         uint256 totalStake;
         uint256 rocketId;
         uint256 targetPlanet;
@@ -48,6 +53,11 @@ contract SpaceMafia is Ownable {
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
+        lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
+    }
+
+    function depositInAAVE(uint256 amount) public payable{
+        ILendingPool(lendingpool).deposit(address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE), amount, address(this), 0);
     }
 
     modifier planetExists(uint256 _tokenId) {
@@ -105,6 +115,7 @@ contract SpaceMafia is Ownable {
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         stakedEth[_tokenId] = stakedEth[_tokenId].add(msg.value);
+        depositInAAVE(msg.value);
         lastStakedTime[_tokenId] = block.timestamp;
         return true;
     }
@@ -185,7 +196,7 @@ contract SpaceMafia is Ownable {
     }
 
     function hijack(
-        uint256 _nukeId, 
+        uint256 _nukeId,
         uint256 _hijackCost
     ) public isNukeValid(_nukeId) returns (bool) {
         address _hijacker = msg.sender;
@@ -198,7 +209,7 @@ contract SpaceMafia is Ownable {
         uint256 _numerator = _hijackCost;
         uint256 _denominator = _hijackCost.add(_n.missionCost);
         uint256 _threshold = getThreshold(_numerator, _denominator);
-        uint256 _random = getRandom(blockhash(block.number - 1)); //This is not safe, but hey.. that's what we got after 24h of no sleep... 
+        uint256 _random = getRandom(blockhash(block.number - 1)); //This is not safe, but hey.. that's what we got after 24h of no sleep...
         // Add MAFIA to totalStake
         galaxyToken.safeTransferFrom(_hijacker, address(this), mafiaToken, _hijackCost, "");
         _n.totalStake = _n.totalStake + _hijackCost;
