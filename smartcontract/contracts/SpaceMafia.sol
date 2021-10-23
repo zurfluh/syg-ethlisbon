@@ -59,8 +59,7 @@ contract SpaceMafia is Ownable {
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
-        galaxyToken.setApprovalForAll(msg.sender, true);
-        galaxyToken.addOperator(msg.sender, planetType);
+        // galaxyToken.addOperator(msg.sender, planetType);
         initialized = true;
         // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
     }
