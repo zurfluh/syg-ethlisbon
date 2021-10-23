@@ -50,8 +50,8 @@ contract SpaceMafia is Ownable {
     function mintPlanet(
         address _account,
         string memory _tokenURI
-    ) public onlyOwner() returns(uint256 _id){
-        _id = galaxyToken.nonFungibleMint(_account, planetType, _tokenURI);
+    ) public onlyOwner returns(uint256 _id){
+        _id = galaxyToken.nonFungibleMint(_account, planetType , _tokenURI);
     }
 
     function stakeEthOnPlanet(
