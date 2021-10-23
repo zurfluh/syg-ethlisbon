@@ -48,15 +48,14 @@ contract SpaceMafia is Ownable {
     mapping(uint256 => Nuke) nukes;
 
     constructor()  {
-        
     }
 
-    function initialize() public  {
-        galaxyToken = new GalaxyToken();
+    function initialize(address _galaxyToken) public onlyOwner {
+        galaxyToken = GalaxyToken(_galaxyToken);
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
-        lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
+        // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
     }
 
     function depositInAAVE(uint256 amount) public payable{

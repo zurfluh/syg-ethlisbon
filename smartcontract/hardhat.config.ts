@@ -46,7 +46,8 @@ const config: HardhatUserConfig = {
     },
     development: {
       url: "http://127.0.0.1:8545",
-      gasPrice:1
+      gasPrice:1,
+      blockGasLimit:10000000
     },
   },
   gasReporter: {
