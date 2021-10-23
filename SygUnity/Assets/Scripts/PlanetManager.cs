@@ -6,6 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using WalletConnectSharp.Core.Models.Ethereum;
+using WalletConnectSharp.Unity;
 
 public class PlanetManager : MonoBehaviour
 {
@@ -38,25 +40,79 @@ public class PlanetManager : MonoBehaviour
 
         var claimDividendsFunction = spaceMafiaService.ContractHandler.GetFunction<ClaimDividendsFunction>();
 
-        var currentNonce = await web3.Eth.Transactions.GetTransactionCount.SendRequestAsync("0x54782", BlockParameter.CreatePending());
+        var address = WalletConnect.ActiveSession.Accounts[0];
+
+        var currentNonce = await web3.Eth.Transactions.GetTransactionCount.SendRequestAsync(address, BlockParameter.CreatePending());
         Debug.Log("Current nonce: " + currentNonce);
 
         var transactionInput = claimDividendsFunction.CreateTransactionInput(new ClaimDividendsFunction
         {
             Nonce = currentNonce.Value + 1,
             TokenId = planetId
-        }, "0x0");
+        }, address);
 
         Debug.Log("Transaction input: " + transactionInput);
 
         string rawTx = transactionInput.Data;
         Debug.Log("Raw transaction: " + rawTx);
-        // TODO: Sign and send trx by external wallet.
+
+        var transaction = new TransactionData()
+        {
+            data = transactionInput.Data,
+            from = transactionInput.From,
+            to = transactionInput.To,
+            gas = "50000",
+            value = "0",
+            chainId = 5,
+            nonce = (currentNonce.Value).ToString(),
+            gasPrice = "50000000000"
+        };
+
+        WalletConnectUnitySession activeSession = WalletConnect.ActiveSession;
+        var results = await activeSession.EthSendTransaction(transaction);
+                Debug.Log(results);
     }
 
     public async Task StakeEther(System.Numerics.BigInteger planetId, float amount)
     {
-        Debug.Log("stake" + amount);
+        Debug.Log("stake ether");
+
+        var web3 = new Web3(GameManager.Instance.InfuraUrl);
+        var spaceMafiaService = new SpaceMafiaService(web3, GameManager.Instance.SpaceMafiaContractAddress);
+
+        var claimDividendsFunction = spaceMafiaService.ContractHandler.GetFunction<StakeEthOnPlanetFunction>();
+
+        var address = WalletConnect.ActiveSession.Accounts[0];
+
+        var currentNonce = await web3.Eth.Transactions.GetTransactionCount.SendRequestAsync(address, BlockParameter.CreatePending());
+        Debug.Log("Current nonce: " + currentNonce);
+
+        var transactionInput = claimDividendsFunction.CreateTransactionInput(new StakeEthOnPlanetFunction
+        {
+            Nonce = currentNonce.Value + 1,
+            TokenId = planetId
+        }, address);
+
+        Debug.Log("Transaction input: " + transactionInput);
+
+        string rawTx = transactionInput.Data;
+        Debug.Log("Raw transaction: " + rawTx);
+
+        var transaction = new TransactionData()
+        {
+            data = transactionInput.Data,
+            from = transactionInput.From,
+            to = transactionInput.To,
+            gas = "50000",
+            value = "100000000000000",
+            chainId = 5,
+            nonce = (currentNonce.Value).ToString(),
+            gasPrice = "10000000000"
+        };
+
+        WalletConnectUnitySession activeSession = WalletConnect.ActiveSession;
+        var results = await activeSession.EthSendTransaction(transaction);
+        Debug.Log(results);
     }
 
     public void AddRocket(System.Numerics.BigInteger planetId)

@@ -1,5 +1,6 @@
 using Nethereum.Web3;
 using SygEthlisbon.Contracts.SpaceMafia;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -88,16 +89,26 @@ public class Scene1Manager : MonoBehaviour
         }
     }
 
-    public async Task ClaimRewards()
+    public void ClaimRewards()
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
-        await this.selectedPM.ClaimRewards(planetId);
+        StartCoroutine(ClaimRewardsCoroutine(planetId));
     }
 
-    public async Task StakeEther(float amount)
+    public IEnumerator ClaimRewardsCoroutine(System.Numerics.BigInteger planetId)
+    {
+        yield return this.selectedPM.ClaimRewards(planetId);
+    }
+
+    public void StakeEther(float amount)
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
-        await this.selectedPM.StakeEther(planetId, 1f);
+        StartCoroutine(StakeEtherCoroutine(planetId));
+    }
+
+    public IEnumerator StakeEtherCoroutine(System.Numerics.BigInteger planetId)
+    {
+        yield return this.selectedPM.StakeEther(planetId, 1f);
     }
 
     public void AddRocket()

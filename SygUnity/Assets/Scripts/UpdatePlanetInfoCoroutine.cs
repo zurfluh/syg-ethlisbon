@@ -16,7 +16,7 @@ public class UpdatePlanetInfoCoroutine : MonoBehaviour
     public InputField InputUrl;
 
     public Text planetName;
-    public Text planetOwner;
+    public Text EthAddress;
     public Text StakeAmount;
 
     // Use this for initialization
@@ -33,12 +33,12 @@ public class UpdatePlanetInfoCoroutine : MonoBehaviour
 
     private async Task update(System.Numerics.BigInteger planetId, PlanetManager pm, string selectedName)
     {
-        System.Numerics.BigInteger eth = await pm.GetStakedEth(planetId);
+        //System.Numerics.BigInteger eth = await pm.GetStakedEth(planetId);
 
         // UI Texts
-        planetOwner.text = await pm.GetOwnerAddress(planetId);
+        EthAddress.text = await pm.GetOwnerAddress(planetId);
         planetName.text = selectedName;
-        StakeAmount.text = eth.ToString();
+        //StakeAmount.text = eth.ToString();
 
         // Size
         //int index = Mathf.FloorToInt((float)eth);
