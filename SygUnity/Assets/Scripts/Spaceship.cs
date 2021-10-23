@@ -10,7 +10,7 @@ public class Spaceship : MonoBehaviour
     void Start()
     {
         speed = Random.Range(25.0f, 40.0f);
-        distance = Random.Range(0.8f, 3f);
+        distance = Random.Range(0.8f, 2f);
         transform.GetChild(0).localPosition = new Vector3(distance, 0, 0);
     }
     
