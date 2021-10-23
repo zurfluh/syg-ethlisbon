@@ -22,9 +22,7 @@ public class GetLatestBlockCoroutine : MonoBehaviour
 
     public void GetBlockNumberRequest()
     {
-        UnityEngine.Debug.Log("aaa");
         StartCoroutine(GetBlockNumber());
-        UnityEngine.Debug.Log("zzz");
     }
 
     public IEnumerator GetBlockNumber()
