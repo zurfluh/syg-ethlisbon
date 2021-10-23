@@ -1,5 +1,6 @@
 using Nethereum.Web3;
 using SygEthlisbon.Contracts.SpaceMafia;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ public class Scene1Manager : MonoBehaviour
     public Dropdown dropdown;
     public Text StakeAmount;
     private string ethAddressString = "";
+    private float stakedEthFloat;
 
     private GameObject selected;
     private PlanetManager selectedPM;
@@ -50,6 +52,7 @@ public class Scene1Manager : MonoBehaviour
     void Update()
     {
         ethAddress.text = ethAddressString;
+        StakeAmount.text = stakedEthFloat.ToString();
         if (Input.GetMouseButtonDown(0)) {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
@@ -100,11 +103,15 @@ public class Scene1Manager : MonoBehaviour
 
     private async Task update(System.Numerics.BigInteger planetId, PlanetManager pm, string selectedName)
     {
-        // System.Numerics.BigInteger eth = await pm.GetStakedEth(planetId);
+        // Staked ETH
+        System.Numerics.BigInteger stakedEth = await pm.GetStakedEth(planetId);
+        // Step 1: bring the number down to a small number so it can be managed as a float
+        stakedEthFloat = (float)(stakedEth / System.Numerics.BigInteger.Pow(10, 14));
+        // Compute the exact amount as a float
+        stakedEthFloat = stakedEthFloat / 10000;
 
-        // UI Texts
+        // Get Address
         ethAddressString = await pm.GetOwnerAddress(planetId);
-        // StakeAmount.text = eth.ToString();
 
         // Size
         //int index = Mathf.FloorToInt((float)eth);
