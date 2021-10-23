@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC1155/IERC1155Receiver.sol";
 
 contract GalaxyToken is ERC1155, Ownable{
     using SafeMath for uint256;
@@ -35,6 +36,10 @@ contract GalaxyToken is ERC1155, Ownable{
     mapping(uint256 => string) public tokenMetadata;
 
     mapping(uint256 => uint256) public totalSupply;
+
+    // selectors for receiver callbacks
+    bytes4 constant public ERC1155_RECEIVED       = 0xf23a6e61;
+    bytes4 constant public ERC1155_BATCH_RECEIVED = 0xbc197c81;
 
     constructor() ERC1155("GalaxyToken") { }
 
@@ -169,6 +174,26 @@ contract GalaxyToken is ERC1155, Ownable{
         tokenMetadata[id] = tokenURI;
 
         emit NfTokenMint(account, id);
+    }
+    
+    function onERC1155Received(
+        address operator,
+        address from,
+        uint256 id,
+        uint256 value,
+        bytes calldata data
+    ) external returns (bytes4){
+        return ERC1155_RECEIVED;
+    }
+
+    function onERC1155BatchReceived(
+        address operator,
+        address from,
+        uint256[] calldata ids,
+        uint256[] calldata values,
+        bytes calldata data
+    ) external returns (bytes4){
+        return ERC1155_BATCH_RECEIVED;
     }
 
     function fungibleMint(

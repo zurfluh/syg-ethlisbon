@@ -735,7 +735,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 0x0979B95148D989D6b0663b3F3134143730BbD68f
+  m_Text: 0x1bc1797ec0a8022d37b345c310af62f1d9ac97da
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -1544,7 +1544,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0x0979B95148D989D6b0663b3F3134143730BbD68f
+  m_Text: 0x1bc1797ec0a8022d37b345c310af62f1d9ac97da
 --- !u!222 &1074746372
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1890,7 +1890,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: 0x148eBFCA0424c2A6Bb6bd66356995006F53295e1
+  m_Text: 0xb4a5c575cC3c2B07995fd58E7869AC4F22BE2091
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -2137,7 +2137,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 0x148eBFCA0424c2A6Bb6bd66356995006F53295e1
+  m_Text: 0xb4a5c575cC3c2B07995fd58E7869AC4F22BE2091
 --- !u!222 &1809740398
 CanvasRenderer:
   m_ObjectHideFlags: 0

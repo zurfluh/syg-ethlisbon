@@ -1,5 +1,6 @@
 using Nethereum.Web3;
 using SygEthlisbon.Contracts.SpaceMafia;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,8 +10,11 @@ using UnityEngine.UI;
 public class Scene1Manager : MonoBehaviour
 {
     public Text planetName;
-    public Text planetOwner;
+    public Text ethAddress;
+    public Dropdown dropdown;
     public Text StakeAmount;
+    private string ethAddressString = "";
+    private float stakedEthFloat;
 
     private GameObject selected;
     private PlanetManager selectedPM;
@@ -47,6 +51,8 @@ public class Scene1Manager : MonoBehaviour
 
     void Update()
     {
+        ethAddress.text = ethAddressString;
+        StakeAmount.text = stakedEthFloat.ToString();
         if (Input.GetMouseButtonDown(0)) {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 mousePos2D = new Vector2(mousePos.x, mousePos.y);
@@ -65,13 +71,13 @@ public class Scene1Manager : MonoBehaviour
                 PlanetManager pm = selected.gameObject.GetComponent<PlanetManager>();
                 this.selectedPM = pm;
                 System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
-                StartCoroutine(new UpdatePlanetInfoCoroutine().UpdatePlanetInfo(planetId, pm, selectedName));
+                planetName.text = selectedName;
+                StartCoroutine(UpdatePlanetInfo(planetId, pm, selectedName));
 
                 //System.Numerics.BigInteger eth = await pm.GetStakedEth(planetId);
                                 
                 //// UI Texts
                 //planetOwner.text = await pm.GetOwnerAddress(planetId);
-                //planetName.text = selectedName;
                 //StakeAmount.text = eth.ToString();
 
                 //// Size
@@ -89,7 +95,37 @@ public class Scene1Manager : MonoBehaviour
         }
     }
 
-    public void ClaimRewards()
+    public IEnumerator UpdatePlanetInfo(System.Numerics.BigInteger planetId, PlanetManager pm, string selectedName)
+    {
+        Task task =  update(planetId, pm, selectedName);
+        yield return new WaitUntil(() => task.IsCompleted);
+    }
+
+    private async Task update(System.Numerics.BigInteger planetId, PlanetManager pm, string selectedName)
+    {
+        // Staked ETH
+        System.Numerics.BigInteger stakedEth = await pm.GetStakedEth(planetId);
+        // Step 1: bring the number down to a small number so it can be managed as a float
+        stakedEthFloat = (float)(stakedEth / System.Numerics.BigInteger.Pow(10, 14));
+        // Compute the exact amount as a float
+        stakedEthFloat = stakedEthFloat / 10000;
+
+        // Get Address
+        ethAddressString = await pm.GetOwnerAddress(planetId);
+
+        // Size
+        //int index = Mathf.FloorToInt((float)eth);
+        //child.transform.localScale = sizes[index];
+
+        //SpriteRenderer sr = child.gameObject.GetComponent<SpriteRenderer>();
+        //float r = 0.3f + 0.03f * index;
+        //float g = 0.1f * index;
+        //float b = 0.2f + 0.06f * index;
+        //Color color = new Color(r, g, b);
+        //sr.color = color;
+    }
+
+    public async Task ClaimRewards()
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
         StartCoroutine(ClaimRewardsCoroutine(planetId));
@@ -115,5 +151,10 @@ public class Scene1Manager : MonoBehaviour
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
         this.selectedPM.AddRocket(planetId);
+    }
+
+    public void Attack()
+    {
+        this.selectedPM.Attack(dropdown.options[dropdown.value].text);
     }
 }

@@ -12,6 +12,7 @@ using WalletConnectSharp.Unity;
 public class PlanetManager : MonoBehaviour
 {
     public GameObject rocketPrefab;
+    private int numberRockets;
 
     public async Task<System.Numerics.BigInteger> GetStakedEth(System.Numerics.BigInteger planetId)
     {
@@ -120,5 +121,25 @@ public class PlanetManager : MonoBehaviour
         Debug.Log("add rocket");
 
         GameObject go = Instantiate(rocketPrefab, transform);
+        SpriteRenderer sr = go.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+        float r = 0.1f + Random.Range(0, 0.5f);;
+        float g = 0.3f + Random.Range(0, 0.75f);;
+        float b = 0.3f + Random.Range(0, 0.75f);;
+        Color color = new Color(r, g, b);
+        sr.color = color;
+        numberRockets++;
+    }
+
+    public void Attack(string planetName)
+    {
+        if (numberRockets > 0)
+        {
+            GameObject go = GameObject.Find(planetName);
+            Spaceship[] sp = GetComponentsInChildren<Spaceship>();
+            foreach (Spaceship s in sp)
+            {
+                s.StartAttack(go.transform);
+            }
+        }
     }
 }
