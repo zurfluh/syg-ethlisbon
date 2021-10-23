@@ -10,15 +10,16 @@ contract SpaceMafia is Ownable {
 
     using SafeMath for uint256;
 
-    uint256 constant APR_TIME_PERIOD = 1 weeks; 
+    uint256 constant APR_TIME_PERIOD = 1 seconds; 
+    uint256 constant ROCKET_COST = 1 ether; 
 
     // ERC1155 Token interface
     GalaxyToken public galaxyToken;
 
     // Planet type id
     uint256 public planetType;
-    // Spaceship type id
-    uint256 public spaceshipType;
+    // Rocket type id
+    uint256 public rocketType;
     // Mafia ERC20 Token
     uint256 public mafiaToken;
 
@@ -29,7 +30,7 @@ contract SpaceMafia is Ownable {
         galaxyToken = GalaxyToken(_galaxyToken);
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
-        spaceshipType = galaxyToken.createTokenType(true);
+        rocketType = galaxyToken.createTokenType(true);
     }
 
     modifier planetExist(uint256 _tokenId) {
@@ -79,7 +80,17 @@ contract SpaceMafia is Ownable {
         address _owner = galaxyToken.getNfOwner(_tokenId);
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         lastStakedTime[_tokenId] = block.timestamp;
-        galaxyToken.dividendClaim(mafiaToken, _owner);
+        return galaxyToken.dividendClaim(mafiaToken, _owner);
+    }
+
+    function mintRocket(
+        uint256 _planetId
+    ) public returns(uint256 _id){
+        address _owner = galaxyToken.getNfOwner(_planetId);
+        require(galaxyToken.balanceOf(msg.sender, mafiaToken) >= ROCKET_COST, "Sender does not have enough balance");
+        galaxyToken.fungibleBurn(msg.sender, mafiaToken, ROCKET_COST);
+        uint256 _power = block.timestamp % 10; //Request from chainlink
+        _id = galaxyToken.nonFungibleMint(_owner, rocketType , string(abi.encodePacked("{planet:", _planetId, ",power:", _power, "}")));
     }
 
 

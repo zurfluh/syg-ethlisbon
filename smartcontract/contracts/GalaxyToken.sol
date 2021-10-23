@@ -40,6 +40,7 @@ contract GalaxyToken is ERC1155 {
 
     constructor(string memory URI, address owner) ERC1155(URI) {
         _owner = owner;
+        ERC1155.setApprovalForAll(_owner,true);
     }
 
     /***********************************|
@@ -231,7 +232,7 @@ contract GalaxyToken is ERC1155 {
         }
     }
 
-    function provideDividend(uint256 _type, address account, uint256 amount) public payable onlyOwner {
+    function provideDividend(uint256 _type, address account, uint256 amount) public onlyOwner {
         require(
             isFungible(_type),
             "TRIED_TO_STAKE_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
@@ -242,11 +243,13 @@ contract GalaxyToken is ERC1155 {
         emit OwnerCredited(_type, account, amount);
     }
 
-    function dividendClaim(uint256 _type, address account) public payable {
+    function dividendClaim(uint256 _type, address account) public returns (uint256 _amount)  {
         require(
             isFungible(_type),
             "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
-        fungibleMint(account,_type,claimableAmount[account][_type],"");
+        _amount = claimableAmount[account][_type];
+        fungibleMint(account,_type,_amount,"");
+        claimableAmount[account][_type] = 0;
     }   
 }
