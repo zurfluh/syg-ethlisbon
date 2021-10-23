@@ -100,9 +100,9 @@ public class Scene1Manager : MonoBehaviour
         await this.selectedPM.StakeEther(planetId, 1f);
     }
 
-    public async Task AddRocket()
+    public void AddRocket()
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
-        await this.selectedPM.AddRocket(planetId);
+        this.selectedPM.AddRocket(planetId);
     }
 }

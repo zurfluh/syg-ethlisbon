@@ -59,7 +59,7 @@ public class PlanetManager : MonoBehaviour
         Debug.Log("stake" + amount);
     }
 
-    public async Task AddRocket(System.Numerics.BigInteger planetId)
+    public void AddRocket(System.Numerics.BigInteger planetId)
     {
         Debug.Log("add rocket");
 
