@@ -38,9 +38,9 @@ contract GalaxyToken is ERC1155 {
 
     mapping(uint256 => uint256) public _totalSupply;
 
-    constructor(string memory URI, address owner) ERC1155(URI) {
-        _owner = owner;
-        ERC1155.setApprovalForAll(_owner,true);
+    constructor() ERC1155("GalaxyToken") {
+        _owner = msg.sender;
+        ERC1155.setApprovalForAll(msg.sender,true);
     }
 
     /***********************************|

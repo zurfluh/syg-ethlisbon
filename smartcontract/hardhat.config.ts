@@ -3,6 +3,9 @@ import * as dotenv from "dotenv";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
+import "hardhat-deploy-ethers";
+import "hardhat-deploy"
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
@@ -35,14 +38,27 @@ const config: HardhatUserConfig = {
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
+    goerli:{
+      url: "https://goerli.infura.io/v3/e8c847c8a43a4f9b95ac3182349c0932",
+      accounts: ["d7f003b771626dca712ef06f602ee0f076b98917e528d4de188790036589e0be"],
+      chainId:5,
+    },
+    development: {
+      url: "http://127.0.0.1:8545",
+      gasPrice:1000000000
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: "MAYQK87FDX6JCJS4DVW4NKIJ9H76XGNFCA",
   },
+  namedAccounts:{
+    deployer:0,
+    tokenOwner:1,
+  }
 };
 
 export default config;
