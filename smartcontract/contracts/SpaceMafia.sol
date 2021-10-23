@@ -60,6 +60,42 @@ contract SpaceMafia is Ownable {
         // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
     }
 
+    function getPlanet(uint256 _id) public view returns (address, string memory){
+        return (galaxyToken.getNfOwner(_id), galaxyToken.tokenMetadata(_id));
+    }
+
+    function getRocket(uint256 _id) public view returns (address, string memory){
+        return (galaxyToken.getNfOwner(_id), galaxyToken.tokenMetadata(_id));
+    }
+
+    function getMafiaBalanceOf(address _account) public view returns (uint256){
+        return galaxyToken.balanceOf(_account, mafiaToken);
+    }
+    
+    function getPlanetSupply() public view returns (uint256){
+        return galaxyToken.totalSupply(planetType);
+    }
+
+    function getRocketSupply() public view returns (uint256){
+        return galaxyToken.totalSupply(rocketType);
+    }
+
+    function getMafiaTokenSupply() public view returns (uint256){
+        return galaxyToken.totalSupply(mafiaToken);
+    }
+
+    function transferPlanet(address _to, uint256 _id) public {
+        return galaxyToken.safeTransferFrom(msg.sender, _to, _id, 1, "");
+    }
+
+    function transferRocket(address _to, uint256 _id) public {
+        return galaxyToken.safeTransferFrom(msg.sender, _to, _id, 1, "");
+    }
+    
+    function transferMafiaToken(address _to, uint256 _amount) public {
+        return galaxyToken.safeTransferFrom(msg.sender, _to, mafiaToken, _amount, "");
+    }
+
     function depositInAAVE(uint256 amount) public payable{
         ILendingPool(lendingpool).deposit(address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE), amount, address(this), 0);
     }

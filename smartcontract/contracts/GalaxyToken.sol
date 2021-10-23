@@ -32,9 +32,9 @@ contract GalaxyToken is ERC1155, Ownable{
 
     mapping(uint256 => bool) internal unlockedId;
 
-    mapping(uint256 => string) internal tokenMetadata;
+    mapping(uint256 => string) public tokenMetadata;
 
-    mapping(uint256 => uint256) public _totalSupply;
+    mapping(uint256 => uint256) public totalSupply;
 
     constructor() ERC1155("GalaxyToken") { }
 
@@ -153,7 +153,7 @@ contract GalaxyToken is ERC1155, Ownable{
             "TRIED_TO_MINT_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
 
-        uint256 index = ++_totalSupply[_type];
+        uint256 index = ++totalSupply[_type];
 
         id = _type | index;
 
@@ -175,7 +175,7 @@ contract GalaxyToken is ERC1155, Ownable{
             "TRIED_TO_MINT_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
         super._mint(account, _type, amount, data);
-        _totalSupply[_type] += amount;
+        totalSupply[_type] += amount;
         holderAmount[account][_type] += amount;
         return true;
     }
@@ -190,7 +190,7 @@ contract GalaxyToken is ERC1155, Ownable{
             "TRIED_TO_BURN_FUNGIBLE_FOR_NON_FUNGIBLE_TOKEN"
         );
         super._burn(account, _type, amount);
-        _totalSupply[_type] -= amount;
+        totalSupply[_type] -= amount;
         holderAmount[account][_type] -= amount;
         return true;
     }
