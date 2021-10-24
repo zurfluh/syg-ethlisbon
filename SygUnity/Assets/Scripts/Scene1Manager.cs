@@ -23,6 +23,7 @@ public class Scene1Manager : MonoBehaviour
     private Vector3[] sizes;
     private System.Numerics.BigInteger basePlanetId;
 
+
     private Dictionary<string, int> planetOffsets = new Dictionary<string, int>
     {
         { "Bob", 1 },
@@ -125,6 +126,8 @@ public class Scene1Manager : MonoBehaviour
         //sr.color = color;
     }
 
+
+
     public async Task ClaimRewards()
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
@@ -147,14 +150,19 @@ public class Scene1Manager : MonoBehaviour
         yield return this.selectedPM.StakeEther(planetId, 1f);
     }
 
-    public void AddRocket()
+    public async void AddRocket()
     {
         System.Numerics.BigInteger planetId = basePlanetId + selectedOffset;
         this.selectedPM.AddRocket(planetId);
+        await this.selectedPM.MintRocket(planetId);
     }
 
     public void Attack()
     {
         this.selectedPM.Attack(dropdown.options[dropdown.value].text);
+        var attackingPlanet = planetOffsets[dropdown.options[dropdown.value].text];
+        var attackingRocket = rocketOffsets[dropdown.options[dropdown.value].text];
+        var missionCost = 500000000;
+        this.selectedPM.Attacking(attackingPlanet, attackingRocket, missionCost);
     }
 }
