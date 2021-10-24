@@ -64,9 +64,8 @@ contract SpaceMafia is Ownable {
         mafiaToken = galaxyToken.createTokenType(false);
         planetType = galaxyToken.createTokenType(true);
         rocketType = galaxyToken.createTokenType(true);
-        // galaxyToken.addOperator(msg.sender, planetType);
         initialized = true;
-        // lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
+        lendingpool = ILendingPoolAddressesProvider(address(0x24a42fD28C976A61Df5D00D0599C34c4f90748c8)).getLendingPool();
     }
 
     function getPlanet(uint256 _id) public view returns (address, string memory){
@@ -174,7 +173,7 @@ contract SpaceMafia is Ownable {
         // Update dividends
         galaxyToken.provideDividend(mafiaToken, _owner, _getPendingClaimableAmount(_tokenId));
         stakedEth[_tokenId] = stakedEth[_tokenId].add(msg.value);
-        // depositInAAVE(msg.value);
+        depositInAAVE(msg.value);
         lastStakedTime[_tokenId] = block.timestamp;
         return true;
     }
