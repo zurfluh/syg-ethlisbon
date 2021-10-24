@@ -14,15 +14,17 @@ module.exports = async({getNamedAccounts, deployments}) => {
 
     const planetType = await spaceMafia.planetType();
     console.log('planetType: ', planetType.toString());
-
+    const _1account = "0xbf652059f7fE27e4e39dBD3B5B5E5eAbC34c6741";
     // MINT PLANETS
-    await spaceMafia.mintPlanet("0xbf652059f7fE27e4e39dBD3B5B5E5eAbC34c6741",'Lobstrum', {gasLimit: 12450000})
+    await spaceMafia.mintPlanet(_1account,'Lobstrum', {gasLimit: 12450000})
     await spaceMafia.mintPlanet(accounts.deployer,'Crayons', {gasLimit: 12450000})
-    await spaceMafia.mintPlanet("0xbf652059f7fE27e4e39dBD3B5B5E5eAbC34c6741",'Squiddy', {gasLimit: 12450000})
+    await spaceMafia.mintPlanet(_1account,'Squiddy', {gasLimit: 12450000})
     await spaceMafia.mintPlanet(accounts.deployer,'Whaylu', {gasLimit: 12450000})
-    await spaceMafia.mintPlanet("0xbf652059f7fE27e4e39dBD3B5B5E5eAbC34c6741",'Sharky', {gasLimit: 12450000})
+    await spaceMafia.mintPlanet(_1account,'Sharky', {gasLimit: 12450000})
     console.log('Mint successsful')
     await spaceMafia.transferPlanet("0x9b39b00989854A89B4f70Df0D2a432C68d9c1306", planetType.add('2').toString(), {gasLimit: 12450000});
     console.log('Transfer successful:', await spaceMafia.getPlanet(planetType.add('1').toString()));
+    const planets = (await spaceMafia.getPlanetsOf(_1account)).filter(e=>e!=0);
+    console.log(`${_1account} has these ${planets.length} planets: ${planets.toString()}`)
   };
   module.exports.tags = ['All'];

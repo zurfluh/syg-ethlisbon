@@ -40,8 +40,8 @@ const config: HardhatUserConfig = {
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     goerli:{
-      url: "https://goerli.infura.io/v3/e8c847c8a43a4f9b95ac3182349c0932",
-      accounts: ["d7f003b771626dca712ef06f602ee0f076b98917e528d4de188790036589e0be"],
+      url: process.env.GOERLI_URL || "",
+      accounts: process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       chainId:5,
     },
     development: {
@@ -55,7 +55,7 @@ const config: HardhatUserConfig = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: "MAYQK87FDX6JCJS4DVW4NKIJ9H76XGNFCA",
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   namedAccounts: {
     deployer:0,
