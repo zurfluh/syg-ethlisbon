@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Nethereum.Web3;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour

@@ -1964,6 +1964,7 @@ MonoBehaviour:
   planetName: {fileID: 690822118}
   planetOwner: {fileID: 5283731801990511365}
   dropdown: {fileID: 623615262}
+  StakeAmount: {fileID: 943166417}
 --- !u!1 &1041636019
 GameObject:
   m_ObjectHideFlags: 0
