@@ -80,6 +80,18 @@ contract SpaceMafia is Ownable {
     function getMafiaBalanceOf(address _account) public view returns (uint256){
         return galaxyToken.balanceOf(_account, mafiaToken);
     }
+
+    function getPlanetsOf(address _account) public view returns (uint256[] memory _out){
+        uint256 _planetSupply = galaxyToken.totalSupply(planetType);
+        _out = new uint256[](_planetSupply);
+        for (uint256 j = 0; j < _planetSupply; j++) { 
+            uint256 _planetId = planetType.add(j+1);
+            if (galaxyToken.getNfOwner(_planetId) == _account) {
+                _out[j]=_planetId;
+            }
+        }
+        return _out;
+    }
     
     function getPlanetSupply() public view returns (uint256){
         return galaxyToken.totalSupply(planetType);
@@ -223,7 +235,8 @@ contract SpaceMafia is Ownable {
         uint256 id,
         uint256 value,
         bytes calldata data
-    ) external returns (bytes4){
+    ) pure external returns (bytes4){
+        abi.encode(operator,from,id,value,data);
         return ERC1155_RECEIVED;
     }
 
@@ -233,7 +246,8 @@ contract SpaceMafia is Ownable {
         uint256[] calldata ids,
         uint256[] calldata values,
         bytes calldata data
-    ) external returns (bytes4){
+    ) pure external returns (bytes4){
+        abi.encode(operator,from,ids,values,data);
         return ERC1155_BATCH_RECEIVED;
     }
 
@@ -274,7 +288,7 @@ contract SpaceMafia is Ownable {
         uint256 _finality = _n.finalityBlock;
         require(block.number < _finality, "Attack is already complete");
         uint256 _numerator = _hijackCost;
-        uint256 _denominator = _hijackCost.add(_n.missionCost);
+        uint256 _denominator = _hijackCost.add(_n.totalStake);
         uint256 _threshold = getThreshold(_numerator, _denominator);
         uint256 _random = getRandom(blockhash(block.number - 1)); //This is not safe, but hey.. that's what we got after 24h of no sleep... 
         // Add MAFIA to totalStake

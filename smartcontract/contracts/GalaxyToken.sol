@@ -182,7 +182,8 @@ contract GalaxyToken is ERC1155, Ownable{
         uint256 id,
         uint256 value,
         bytes calldata data
-    ) external returns (bytes4){
+    ) pure external returns (bytes4){
+        abi.encode(operator,from,id,value,data);
         return ERC1155_RECEIVED;
     }
 
@@ -192,7 +193,8 @@ contract GalaxyToken is ERC1155, Ownable{
         uint256[] calldata ids,
         uint256[] calldata values,
         bytes calldata data
-    ) external returns (bytes4){
+    ) pure external returns (bytes4){
+        abi.encode(operator,from,ids,values,data);
         return ERC1155_BATCH_RECEIVED;
     }
 
